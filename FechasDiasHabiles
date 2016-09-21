@@ -1,0 +1,248 @@
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import co.grupomatrix.mipago.domain.DiasFestivos;
+
+/**
+ * Objeto para manejar las validaciones de los dias habiles para la carga de archivos de pago.
+ * 
+ * @author jhader palomeque (jhader.palomeque@grupomatrix.co)
+ * @version 0.0.1
+ */
+
+public class FestivosUtil {
+
+	private static boolean res;
+	private static SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+	/**
+	 * Metodo encargado de tomar la fecha actual del sistema y aumentarle 
+	 * un dia habil para validar la fecha de pago
+	 * diasFestivos es la variable con la lista de todos los dias festivos del año que estan almec
+	 **/
+	public static boolean isDateGreaterByTowDay(Date fechaPago, List<DiasFestivos> diasFestivos) {
+		Calendar actualDate = Calendar.getInstance();
+		Calendar fechaminima;
+		
+		//valido el dia de la semana en que se cargo el archivo.
+		switch (actualDate.get(Calendar.DAY_OF_WEEK)) {
+		case 1:
+			//amento a la fecha actual un dia habil.
+			actualDate.add(Calendar.DAY_OF_YEAR, 1);
+			fechaminima = lunesAmiercoles(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		case 2:
+			actualDate.add(Calendar.DAY_OF_YEAR, 1);
+			fechaminima = lunesAmiercoles(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		case 3:
+			actualDate.add(Calendar.DAY_OF_YEAR, 1);
+			fechaminima = lunesAmiercoles(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		case 4:
+			actualDate.add(Calendar.DAY_OF_YEAR, 1);
+			fechaminima = miercoles(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		case 5:
+			actualDate.add(Calendar.DAY_OF_YEAR, 1);
+			fechaminima = jueves(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		case 6:
+			actualDate.add(Calendar.DAY_OF_YEAR, 3);
+			fechaminima = lunesAmiercoles(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		case 7:
+			actualDate.add(Calendar.DAY_OF_YEAR, 2);
+			fechaminima = lunesAmiercoles(actualDate, diasFestivos, 0);
+			if (diasHabilesPago(fechaminima, fechaPago)) {
+				return true;
+			}
+			break;
+		}
+
+		return false;
+	}
+
+	private static Calendar lunesAmiercoles(Calendar fecha, List<DiasFestivos> diasFestivos, int contador) {
+		res = false;
+		DiasFestivos df;
+		Calendar festivo = Calendar.getInstance();
+		int tamanoListaFestivos = diasFestivos.size();
+		for (; contador <= diasFestivos.size();) {
+			if (contador != tamanoListaFestivos) {
+				df = diasFestivos.get(contador);
+				festivo.setTime(df.getFecha_dia());
+				if (fecha.get(Calendar.MONTH) == festivo.get(Calendar.MONTH)) {
+					if(fecha.get(Calendar.WEEK_OF_MONTH) == festivo.get(Calendar.WEEK_OF_MONTH)){
+					if (res == false) {
+						if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+							fecha.add(Calendar.DAY_OF_YEAR, 1);
+							if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+
+								fecha.add(Calendar.DAY_OF_YEAR, 1);
+							}else{
+								fecha.add(Calendar.DAY_OF_YEAR, 1);
+							}
+						} else {
+							fecha.add(Calendar.DAY_OF_YEAR, 1);
+							if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+								fecha.add(Calendar.DAY_OF_YEAR, 1);
+							} else {
+								break;
+							}
+						}
+					}
+					}else{
+						lunesAmiercoles(fecha, diasFestivos, contador += 1);
+					}
+				} else {
+					lunesAmiercoles(fecha, diasFestivos, contador += 1);
+				}
+				break;
+			} else {
+				fecha.add(Calendar.DAY_OF_YEAR, 1);
+				break;
+			}
+		}
+		return fecha;
+	}
+
+	private static Calendar jueves(Calendar fecha, List<DiasFestivos> diasFestivos, int contador) {
+		res = false;
+		DiasFestivos df;
+		Calendar festivo = Calendar.getInstance();
+		int tamanoListaFestivos = diasFestivos.size();
+		for (; contador <= diasFestivos.size();) {
+			if (contador != tamanoListaFestivos) {
+				df = diasFestivos.get(contador);
+				festivo.setTime(df.getFecha_dia());
+				if (fecha.get(Calendar.MONTH) == festivo.get(Calendar.MONTH)) {
+					if(fecha.get(Calendar.WEEK_OF_MONTH) == festivo.get(Calendar.WEEK_OF_MONTH)){
+					if (res == false) {
+						if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+							fecha.add(Calendar.DAY_OF_YEAR, 3);
+							if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+								fecha.add(Calendar.DAY_OF_YEAR, 1);
+							} else {
+								fecha.add(Calendar.DAY_OF_YEAR, 1);
+								if ((formatoFecha.format(fecha.getTime()))
+										.equals(formatoFecha.format(df.getFecha_dia()))) {
+									fecha.add(Calendar.DAY_OF_YEAR, 1);
+								} else {
+									break;
+								}
+							}
+						} else {
+							fecha.add(Calendar.DAY_OF_YEAR, 3);
+							if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+								fecha.add(Calendar.DAY_OF_YEAR, 1);
+							} else {
+								break;
+							}
+						}
+					}
+					}else{
+						lunesAmiercoles(fecha, diasFestivos, contador += 1);
+					}
+				} else {
+					jueves(fecha, diasFestivos, contador += 1);
+				}
+				break;
+			} else {
+				fecha.add(Calendar.DAY_OF_YEAR, 3);
+				break;
+			}
+		}
+		return fecha;
+	}
+
+	private static Calendar miercoles(Calendar fecha, List<DiasFestivos> diasFestivos, int contador) {
+		DiasFestivos df;
+		Calendar festivo = Calendar.getInstance();
+		res = false;
+		int tamanoListaFestivos = diasFestivos.size();
+		for (; contador <= diasFestivos.size();) {
+			if (contador != tamanoListaFestivos) {
+				df = diasFestivos.get(contador);
+				festivo.setTime(df.getFecha_dia());
+				if (fecha.get(Calendar.MONTH) == festivo.get(Calendar.MONTH)) {
+					if(fecha.get(Calendar.WEEK_OF_MONTH) == festivo.get(Calendar.WEEK_OF_MONTH)){
+					if (res == false) {
+						if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+							fecha.add(Calendar.DAY_OF_YEAR, 1);
+							if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+								fecha.add(Calendar.DAY_OF_YEAR, 3);
+							} else {
+								fecha.add(Calendar.DAY_OF_YEAR, 3);
+								if ((formatoFecha.format(fecha.getTime()))
+										.equals(formatoFecha.format(df.getFecha_dia()))) {
+									fecha.add(Calendar.DAY_OF_YEAR, 1);
+								} else {
+									res = true;
+
+								}
+							}
+						} else {
+							fecha.add(Calendar.DAY_OF_YEAR, 1);
+							if ((formatoFecha.format(fecha.getTime())).equals(formatoFecha.format(df.getFecha_dia()))) {
+								fecha.add(Calendar.DAY_OF_YEAR, 3);
+							} else {
+								res = true;
+							}
+						}
+					}
+					}else{
+						lunesAmiercoles(fecha, diasFestivos, contador += 1);
+					}
+				} else {
+					miercoles(fecha, diasFestivos, contador += 1);
+				}
+				break;
+			} else {
+				fecha.add(Calendar.DAY_OF_YEAR, 1);
+				break;
+			}
+		}
+
+		return fecha;
+	}
+
+	private static boolean diasHabilesPago(Calendar diahabil, Date fechaPago) {
+		int dayPay = 0;
+		int dayActual = 0;
+
+		Calendar fepago = Calendar.getInstance();
+		fepago.setTime(fechaPago);
+
+		dayPay = (fepago.get(Calendar.YEAR) * 10000) + (fepago.get(Calendar.MONTH) * 100)
+				+ fepago.get(Calendar.DAY_OF_MONTH);
+		dayActual = (diahabil.get(Calendar.YEAR) * 10000) + (diahabil.get(Calendar.MONTH) * 100)
+				+ diahabil.get(Calendar.DAY_OF_MONTH);
+
+		if (dayPay >= dayActual) {
+
+			return true;
+		}
+		return false;
+	}
+
+}
