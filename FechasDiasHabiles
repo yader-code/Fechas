@@ -3,8 +3,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import co.grupomatrix.mipago.domain.DiasFestivos;
-
 /**
  * Objeto para manejar las validaciones de los dias habiles para la carga de archivos de pago.
  * 
